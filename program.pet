@@ -1,0 +1,4 @@
+out "Hello world!"
+out "HI"
+out "my name is Peter"
+out 10 +(2 *4)
