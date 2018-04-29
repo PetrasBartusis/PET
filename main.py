@@ -1,6 +1,8 @@
 from sys import *
 
 tokens = []
+num_stack = []
+symbols = {}
 
 
 def open_file(filename):
@@ -15,6 +17,8 @@ def lex(filecontents):
     string = ""
     filecontents = list(filecontents)
     expr = ""
+    varStarted = 0
+    var = ""
     number = ""
     isexpr = False
     for char in filecontents:
@@ -25,7 +29,6 @@ def lex(filecontents):
                 tok = ""
             else:
                 tok = " "
-
         elif tok == "\n" or tok == "<EOF>":
             if expr != "" and isexpr:
                 tokens.append("expr:" + expr)
@@ -33,8 +36,30 @@ def lex(filecontents):
             elif expr != "" and not isexpr:
                 tokens.append("num:" + expr)
                 expr = ""
+            elif var != "":
+                tokens.append("pet:" + var[3:])
+                var = ""
+                varStarted = 0
             tok = ""
-
+        elif tok == "=" and state == 0:
+            if var != "":
+                tokens.append("pet:" + var[3:])
+                var = ""
+                varStarted = 0
+            tokens.append("EQUALS")
+            tok = ""
+        elif tok == "pet" and state == 0:
+            varStarted = 1
+            var += tok
+            tok = ""
+        elif varStarted == 1:
+            if tok == "<" or tok == ">":
+                if var != "":
+                    tokens.append("pet:" + var[3:])
+                    var = ""
+                    varStarted = 0
+            var += tok
+            tok = ""
         elif tok == "out":
             tokens.append("out")
             tok = ""
@@ -56,8 +81,32 @@ def lex(filecontents):
         elif state == 1:
             string += tok
             tok = ""
-    # print(tokens)
+    print(tokens)
+    # symbols["variable"] = "Hello"
+    # print(symbols)
+    # return ''
     return tokens
+
+
+def evalExpression(expr):
+    return eval(expr)
+    # expr = "," + expr
+    # i = len(expr) - 1
+    # num = ""
+    # while i >= 0:
+    #     # print(expr[i])
+    #     if (expr[i] == "+" or expr[i] == "-" or expr[i] == "/" or expr[i] == "*" or expr[i] == "%"):
+    #         num_stack.append(num)
+    #         num_stack.append(expr[i])
+    #         num = ""
+    #     elif (expr[i] == ","):
+    #         num = num[::-1]
+    #         num_stack.append(num)
+    #         num = ""
+    #     else:
+    #         num += expr[i]
+    #     i-=1
+    # print(num_stack)
 
 
 def doPrint(toprint):
@@ -67,22 +116,44 @@ def doPrint(toprint):
     elif toprint[0:3] == "num":
         toprint = toprint[4:]
     elif toprint[0:4] == "expr":
-        toprint = toprint[5:]
+        toprint = evalExpression(toprint[5:])
     print(toprint)
 
+
+def doASSIGN(varname, varvalue):
+    symbols[varname[4:]] = varvalue
+
+
+def getVARIABLE(varname):
+    varname = varname[4:]
+    if varname in symbols:
+        return symbols[varname]
+    else:
+        return "VARIABLE ERROR: Undefined variable"
 
 def parse(toks):
     i = 0
     while i < len(toks):
-        if toks[i] + " " + toks[i + 1][0:6] == "out string" or toks[i] + " " + toks[i + 1][0:3] == "out num" or toks[i]\
-                + " " + toks[i + 1][0:4] == "out expr":
+        if toks[i] + " " + toks[i + 1][0:6] == "out string" or toks[i] + " " + toks[i + 1][0:3] == "out num" or toks[i] + " " + toks[i + 1][0:4] == "out expr" or toks[i] + " " + toks[i + 1][0:3] == "out num" or toks[i] + " " + toks[i + 1][0:3] == "out pet":
             if toks[i + 1][0:6] == "string":
                 doPrint(toks[i + 1])
             elif toks[i + 1][0:3] == "num":
                 doPrint(toks[i + 1])
             elif toks[i + 1][0:4] == "expr":
                 doPrint(toks[i + 1])
+            elif toks[i + 1][0:3] == "pet":
+                doPrint(getVARIABLE(toks[i+1]))
             i += 2
+        elif toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:6] == "pet EQUALS string" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:3] == "pet EQUALS num" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:4] == "pet EQUALS expr":
+            if toks[i + 2][0:6] == "string":
+                doASSIGN(toks[i], toks[i+2])
+            elif toks[i + 2][0:3] == "num":
+                doASSIGN(toks[i], toks[i+2])
+            elif toks[i + 2][0:4] == "expr":
+                doASSIGN(toks[i], "num:" + str(evalExpression(toks[i+2][5:])))
+            # print(toks[i+2])
+            i += 3
+    print(symbols)
 
 
 def run():

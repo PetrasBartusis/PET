@@ -1,4 +1,4 @@
-out "Hello world!"
-out "HI"
-out "my name is Peter"
-out 10 +(2 *4)
+pet p1 = 10
+out pet p1
+pet p = "Heko"
+out 1
