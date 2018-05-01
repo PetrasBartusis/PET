@@ -1,4 +1,3 @@
-pet p1 = 10
-out pet p1
-pet p = "Heko"
-out 1
+pet p = 10
+pet p1 = pet p
+out pet p

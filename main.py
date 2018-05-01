@@ -130,6 +130,7 @@ def getVARIABLE(varname):
         return symbols[varname]
     else:
         return "VARIABLE ERROR: Undefined variable"
+        exit()
 
 def parse(toks):
     i = 0
@@ -144,13 +145,15 @@ def parse(toks):
             elif toks[i + 1][0:3] == "pet":
                 doPrint(getVARIABLE(toks[i+1]))
             i += 2
-        elif toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:6] == "pet EQUALS string" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:3] == "pet EQUALS num" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:4] == "pet EQUALS expr":
+        elif toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:6] == "pet EQUALS string" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:3] == "pet EQUALS num" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:4] == "pet EQUALS expr" or toks[i][0:3] + " " + toks[i+1] + " " + toks[i+2][0:3] == "pet EQUALS pet":
             if toks[i + 2][0:6] == "string":
                 doASSIGN(toks[i], toks[i+2])
             elif toks[i + 2][0:3] == "num":
                 doASSIGN(toks[i], toks[i+2])
             elif toks[i + 2][0:4] == "expr":
                 doASSIGN(toks[i], "num:" + str(evalExpression(toks[i+2][5:])))
+            elif toks[i + 2][0:3] == "pet":
+                doASSIGN(toks[i], getVARIABLE(toks[i+2]))
             # print(toks[i+2])
             i += 3
     print(symbols)
