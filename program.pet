@@ -1,3 +1,3 @@
-pet p = 10
-pet p1 = pet p
-out pet p
+term 1 == 1 then
+    out "Hello world"
+endterm
