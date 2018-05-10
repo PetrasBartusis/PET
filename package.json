@@ -1,0 +1,15 @@
+{
+  "name": "Simple2JSREPL",
+  "version": "0.0.1",
+  "description": "REPL CLI for the Simple2JS programming language",
+  "main": "simple2JS.js",
+  "bin": {
+    "simple2JS": "simple2JS.js"
+  },
+  "author": "Simple2JS Crew",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.8.1",
+    "escodegen": "^1.6.1"
+  }
+}
