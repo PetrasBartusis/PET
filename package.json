@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^2.8.1",
-    "escodegen": "^1.6.1"
+    "escodegen": "^1.9.1"
   }
 }

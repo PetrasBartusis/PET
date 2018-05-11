@@ -1,11 +1,15 @@
 pet sum(num) {
-	console.log(num);
-	if(num < 5){
-		return sum(num + 1);
-	} else {
-		return 6;
-	}
+    console.log(num);
+    if(num < 5){
+        return sum(num + 1);
+    } else {
+        return 6;
+    }
     
 }
 var p = sum(0);
 console.log(p);
+console.log("CIKLAS:")
+for (var i = 0; i < 10; i++) {
+    console.log(i*i);
+}
