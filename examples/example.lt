@@ -1,15 +1,17 @@
 pet sum(num) {
-    console.log(num);
-    if(num < 5){
-        return sum(num + 1);
+    out(num);
+    term(num < 5){
+        <- sum(num + 1);
     } else {
-        return 6;
+        <- 6;
     }
     
 }
 var p = sum(0);
-console.log(p);
-console.log("CIKLAS:")
-for (var i = 0; i < 10; i++) {
-    console.log(i*i);
+out(p);
+out("CIKLAS:")
+loop (var a = 0; a < 10; a++) {
+	var something = a * a;
+    out(something);
 }
+out("a")

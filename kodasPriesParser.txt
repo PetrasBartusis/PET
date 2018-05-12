@@ -133,41 +133,25 @@ UnicodeConnectorPunctuation
 
 ReservedWord
   = Keyword
-  / FutureReservedWord
   / NullLiteral
   / BooleanLiteral
 
 Keyword
   = ElseToken
-  / FinallyToken
   / ForToken
   / FunctionToken
-  / IfToken
-  / InstanceofToken
-  / InToken
   / NewToken
+  / IfToken  
+  / PrintToken
   / ReturnToken
-  / SwitchToken
-  / ThisToken
-  / TryToken
-  / TypeofToken
   / VarToken
   / VoidToken
-  / WhileToken
-  / WithToken
-
-FutureReservedWord
-  = ExportToken
-  / ExtendsToken
-  / ImportToken
-  / SuperToken
 
 Literal
   = NullLiteral
   / BooleanLiteral
   / NumericLiteral
   / StringLiteral
-  / RegularExpressionLiteral
 
 NullLiteral
   = NullToken { return { type: "Literal", value: null }; }
@@ -285,47 +269,6 @@ UnicodeEscapeSequence
       return String.fromCharCode(parseInt(digits, 16));
     }
 
-RegularExpressionLiteral "regular expression"
-  = "/" pattern:$RegularExpressionBody "/" flags:$RegularExpressionFlags {
-      var value;
-
-      try {
-        value = new RegExp(pattern, flags);
-      } catch (e) {
-        error(e.message);
-      }
-
-      return { type: "Literal", value: value };
-    }
-
-RegularExpressionBody
-  = RegularExpressionFirstChar RegularExpressionChar*
-
-RegularExpressionFirstChar
-  = ![*\\/[] RegularExpressionNonTerminator
-  / RegularExpressionBackslashSequence
-  / RegularExpressionClass
-
-RegularExpressionChar
-  = ![\\/[] RegularExpressionNonTerminator
-  / RegularExpressionBackslashSequence
-  / RegularExpressionClass
-
-RegularExpressionBackslashSequence
-  = "\\" RegularExpressionNonTerminator
-
-RegularExpressionNonTerminator
-  = !LineTerminator SourceCharacter
-
-RegularExpressionClass
-  = "[" RegularExpressionClassChar* "]"
-
-RegularExpressionClassChar
-  = ![\]\\] RegularExpressionNonTerminator
-  / RegularExpressionBackslashSequence
-
-RegularExpressionFlags
-  = IdentifierPart*
 
 // Unicode Character Categories
 //
@@ -386,33 +329,19 @@ Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]
 // Tokens
 
 ElseToken       = "else"       !IdentifierPart
-EnumToken       = "enum"       !IdentifierPart
-ExportToken     = "export"     !IdentifierPart
-ExtendsToken    = "extends"    !IdentifierPart
 FalseToken      = "false"      !IdentifierPart
-FinallyToken    = "finally"    !IdentifierPart
-ForToken        = "for"        !IdentifierPart
-FunctionToken   = "pet"   !IdentifierPart
+ForToken        = "loop"  	   !IdentifierPart
+FunctionToken   = "pet"   	   !IdentifierPart
+PrintToken      = "out"        !IdentifierPart
 GetToken        = "get"        !IdentifierPart
-IfToken         = "if"         !IdentifierPart
-ImportToken     = "import"     !IdentifierPart
-InstanceofToken = "instanceof" !IdentifierPart
-InToken         = "in"         !IdentifierPart
+IfToken         = "term"       !IdentifierPart
 NewToken        = "new"        !IdentifierPart
-NullToken       = "null"       !IdentifierPart
-ReturnToken     = "return"     !IdentifierPart
 SetToken        = "set"        !IdentifierPart
-SuperToken      = "super"      !IdentifierPart
-SwitchToken     = "switch"     !IdentifierPart
-ThisToken       = "this"       !IdentifierPart
-ThrowToken      = "throw"      !IdentifierPart
+NullToken       = "null"       !IdentifierPart
+ReturnToken     = "<-"         !IdentifierPart
 TrueToken       = "true"       !IdentifierPart
-TryToken        = "try"        !IdentifierPart
-TypeofToken     = "typeof"     !IdentifierPart
 VarToken        = "var"        !IdentifierPart
 VoidToken       = "void"       !IdentifierPart
-WhileToken      = "while"      !IdentifierPart
-WithToken       = "with"       !IdentifierPart
 
 // Skipped
 
@@ -440,61 +369,16 @@ EOF
 // ----- A.3 Expressions -----
 
 PrimaryExpression
-  = ThisToken { return { type: "ThisExpression" }; }
-  / Identifier
+  = Identifier
   / Literal
-  / ArrayLiteral
-  / ObjectLiteral
   / "(" __ expression:Expression __ ")" { return expression; }
-
-ArrayLiteral
-  = "[" __ elision:(Elision __)? "]" {
-      return {
-        type: "ArrayExpression",
-        elements: optionalList(extractOptional(elision, 0))
-      };
-    }
-  / "[" __ elements:ElementList __ "]" {
-      return {
-        type: "ArrayExpression",
-        elements: elements
-      };
-    }
-  / "[" __ elements:ElementList __ "," __ elision:(Elision __)? "]" {
-      return {
-        type: "ArrayExpression",
-        elements: elements.concat(optionalList(extractOptional(elision, 0)))
-      };
-    }
-
-ElementList
-  = head:(
-      elision:(Elision __)? element:AssignmentExpression {
-        return optionalList(extractOptional(elision, 0)).concat(element);
-      }
-    )
-    tail:(
-      __ "," __ elision:(Elision __)? element:AssignmentExpression {
-        return optionalList(extractOptional(elision, 0)).concat(element);
-      }
-    )*
-    { return Array.prototype.concat.apply(head, tail); }
+  
+PrintExpression
+  = Literal
+  / VariableStatement
 
 Elision
   = "," commas:(__ ",")* { return filledArray(commas.length + 1, null); }
-
-ObjectLiteral
-  = "{" __ "}" { return { type: "ObjectExpression", properties: [] }; }
-  / "{" __ properties:PropertyNameAndValueList __ "}" {
-       return { type: "ObjectExpression", properties: properties };
-     }
-  / "{" __ properties:PropertyNameAndValueList __ "," __ "}" {
-       return { type: "ObjectExpression", properties: properties };
-     }
-PropertyNameAndValueList
-  = head:PropertyAssignment tail:(__ "," __ PropertyAssignment)* {
-      return buildList(head, tail, 3);
-    }
 
 PropertyAssignment
   = key:PropertyName __ ":" __ value:AssignmentExpression {
@@ -570,9 +454,6 @@ MemberExpression
 
 NewExpression
   = MemberExpression
-  / NewToken __ callee:NewExpression {
-      return { type: "NewExpression", callee: callee, arguments: [] };
-    }
 
 CallExpression
   = head:(
@@ -653,7 +534,6 @@ UnaryExpression
 
 UnaryOperator
   = $VoidToken
-  / $TypeofToken
   / "++"
   / "--"
   / $("+" !"=")
@@ -700,8 +580,6 @@ RelationalOperator
   / ">="
   / $("<" !"<")
   / $(">" !">")
-  / $InstanceofToken
-  / $InToken
 
 RelationalExpressionNoIn
   = head:ShiftExpression
@@ -713,7 +591,6 @@ RelationalOperatorNoIn
   / ">="
   / $("<" !"<")
   / $(">" !">")
-  / $InstanceofToken
 
 EqualityExpression
   = head:RelationalExpression
@@ -911,8 +788,8 @@ Statement
   / IfStatement
   / IterationStatement
   / ReturnStatement
-  / WithStatement
   / LabelledStatement
+  / PrintStatement
 
 Block
   = "{" __ body:(StatementList __)? "}" {
@@ -1002,27 +879,31 @@ IfStatement
       };
     }
 
-IterationStatement
-  = WhileToken __ "(" __ test:Expression __ ")" __
-    body:Statement
-    { return { type: "WhileStatement", test: test, body: body }; }
-  / ForToken __
-    "(" __
-    init:(ExpressionNoIn __)? ";" __
-    test:(Expression __)? ";" __
-    update:(Expression __)?
-    ")" __
-    body:Statement
-    {
+PrintStatement
+  = PrintToken __ "(" __ test:MemberExpression __ ")" {
       return {
-        type: "ForStatement",
-        init: extractOptional(init, 0),
-        test: extractOptional(test, 0),
-        update: extractOptional(update, 0),
-        body: body
-      };
+        type: "ExpressionStatement",
+        expression: {
+        	type: "CallExpression",
+            callee: {
+            	type: "MemberExpression",
+                object: {
+                	type: "Identifier",
+                    name: "console"
+                },
+                property: {
+                  type: "Identifier",
+                  name: "log"
+            	},
+            	computed: false,
+            },
+        	arguments: [test]
+        },
+      }
     }
-  / ForToken __
+
+IterationStatement
+  = ForToken __
     "(" __
     VarToken __ declarations:VariableDeclarationListNoIn __ ";" __
     test:(Expression __)? ";" __
@@ -1045,7 +926,6 @@ IterationStatement
   / ForToken __
     "(" __
     left:LeftHandSideExpression __
-    InToken __
     right:Expression __
     ")" __
     body:Statement
@@ -1060,7 +940,6 @@ IterationStatement
   / ForToken __
     "(" __
     VarToken __ declarations:VariableDeclarationListNoIn __
-    InToken __
     right:Expression __
     ")" __
     body:Statement
@@ -1085,18 +964,10 @@ ReturnStatement
       return { type: "ReturnStatement", argument: argument };
     }
 
-WithStatement
-  = WithToken __ "(" __ object:Expression __ ")" __
-    body:Statement
-    { return { type: "WithStatement", object: object, body: body }; }
-
 LabelledStatement
   = label:Identifier __ ":" __ body:Statement {
       return { type: "LabeledStatement", label: label, body: body };
     }
-
-Finally
-  = FinallyToken __ block:Block { return block; }
 
 // ----- A.5 Functions and Programs -----
 
@@ -1155,15 +1026,3 @@ SourceElements
 SourceElement
   = Statement
   / FunctionDeclaration
-
-// ----- A.6 Universal Resource Identifier Character Classes -----
-
-// Irrelevant.
-
-// ----- A.7 Regular Expressions -----
-
-// Irrelevant.
-
-// ----- A.8 JSON -----
-
-// Irrelevant.
