@@ -1,17 +1,17 @@
-pet sum(num) {
-    out(num);
-    term(num < 5){
-        <- sum(num + 1);
-    } else {
-        <- 6;
-    }
-    
+fun sum (num)
+out num
+term num < 5 & num > 3 {
+<- sum (num+1)
+} else {
+	<- 6
 }
-var p = sum(0);
-out(p);
-out("CIKLAS:")
-loop (var a = 0; a < 10; a++) {
-	var something = a * a;
-    out(something);
+;
+pet p = sum (0)
+p = Math.abs(p)
+out p
+out "CIKLAS:"
+loop pet a = 0; a < 10; a = a + 1 {
+	pet something = a * a
+    out something
 }
-out("a")
+out "a"
