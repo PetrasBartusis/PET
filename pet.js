@@ -23,20 +23,20 @@ program
 program
     .command('compile')
     .alias('comp')
-    .description('compile Simple2JS code to ECMAScript')
-    .option('-s, --source <path>', 'path to Simple2JS source file')
+    .description('compile pet code to ECMAScript')
+    .option('-s, --source <path>', 'path to pet source file')
     .option('-o, --output <path>', 'path to ECMAScript output file')
     .action(function(options){
         if(!options.source){
-            console.error('Simple2JS source file is required');
+            console.error('pet source file is required');
             program.outputHelp();
             return;
-        } else if(path.extname(path.basename(options.source)) !== '.lt'){
-            console.error('Simple2JS source files should have a .lt extension');
+        } else if(path.extname(path.basename(options.source)) !== '.pet'){
+            console.error('pet source files should have a .pet extension');
             return;
         }
 
-        console.log('Attempting to compile Simple2JS code to JavaScript');
+        console.log('Attempting to compile pet code to JavaScript');
 
         fs.readFile(options.source, 'utf8', function(err, source){
             var parsed,
@@ -46,12 +46,12 @@ program
             try{
                 parsed = parser.parse(source),
                 ecma = escodegen.generate(parsed);
-                options.output = options.output || options.source.replace('.lt', '.js');
+                options.output = options.output || options.source.replace('.pet', '.js');
                 result = vm.runInNewContext(ecma, {}, {
                     displayErrors: false,
                     timeout: 10000
                 });
-                console.log('Successfully compiled Simple2JS code to JavaScript');
+                console.log('Successfully compiled pet code to JavaScript');
                 console.log('Evaluation result: ' + result);
                 fs.writeFile(options.output, ecma, 'utf8', function(err){
                     if(err){
@@ -61,7 +61,7 @@ program
                     }
                 });
             } catch(e){
-                console.log('Failed to compile Simple2JS code to JavaScript');
+                console.log('Failed to compile pet code to JavaScript');
                 console.log(e);
             }
         });
@@ -69,14 +69,14 @@ program
 
 program
     .command('repl')
-    .description('launch the Simple2JS CLI REPL utility')
+    .description('launch the pet CLI REPL utility')
     .action(function(options){
-        var simple2JSREPL;
+        var petREPL;
 
-        console.log('Welcome to the Simple2JS REPL!');
+        console.log('Welcome to the pet REPL!');
 
-        simple2JSREPL = repl.start({
-            prompt: 'simple2JSc> ',
+        petREPL = repl.start({
+            prompt: 'petc> ',
             eval: function eval(cmd, context, filename, callback){
                 var parsed,
                     ecma,
@@ -98,11 +98,11 @@ program
             }
         });
 
-        simple2JSREPL.on('exit', function () {
-            console.log('Simple2JS bye!');
+        petREPL.on('exit', function () {
+            console.log('pet bye!');
             process.exit();
         });
     });
 
-console.log('Simple2JS CLI.');
+console.log('pet CLI.');
 program.parse(process.argv);

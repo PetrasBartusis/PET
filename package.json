@@ -1,12 +1,12 @@
 {
-  "name": "Simple2JSREPL",
+  "name": "petREPL",
   "version": "0.0.1",
-  "description": "REPL CLI for the Simple2JS programming language",
-  "main": "simple2JS.js",
+  "description": "REPL CLI for the pet programming language",
+  "main": "pet.js",
   "bin": {
-    "simple2JS": "simple2JS.js"
+    "pet": "pet.js"
   },
-  "author": "Simple2JS Crew",
+  "author": "pet Crew",
   "license": "MIT",
   "dependencies": {
     "commander": "^2.8.1",
