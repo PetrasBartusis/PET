@@ -15,3 +15,5 @@ loop pet a = 0; a < 10; a = a + 1 {
     out something
 }
 out "a"
+
+do_it {sum(0)} ~ false

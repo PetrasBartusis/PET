@@ -15,3 +15,6 @@ for (var a = 0; a < 10; a = a + 1) {
     console.log(something);
 }
 console.log('a');
+do {
+    sum(0);
+} while (false);
