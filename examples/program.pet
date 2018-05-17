@@ -16,4 +16,28 @@ loop pet a = 0; a < 10; a = a + 1 {
 }
 out "a"
 
-do_it {sum(0)} ~ false
+fun fibonacci(fba, fbc, n)
+	term n > 0 {
+		pet currFib = fba + fbc
+		out currFib
+		<- fibonacci (currFib, fba, n-1)
+	} else {
+		pet currFib = fba + fbc
+		<- currFib
+	}
+;
+pet fb = 1
+pet fib = 1
+pet currentFib = 0
+loop pet i = 0; i < 10; i = i + 1 {
+	currentFib = fb + fib
+	fb = fib
+	fib = currentFib
+	out currentFib
+} 
+pet fibRec = fibonacci(1, 1, 5)
+pet p = 0
+do_it {
+	p = p + 1
+	out p
+} ~ p < 10
